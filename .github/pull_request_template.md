@@ -5,8 +5,8 @@
 <!-- The problem it addresses -->
 
 ## How I tested it
-- [ ] `flutter analyze` is clean
-- [ ] `flutter test` passes
+- [ ] `flutter analyze` 
+- [ ] `flutter test` 
 - [ ] Ran the app manually: <!-- -->
 
 ## Screenshots
