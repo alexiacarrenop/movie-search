@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../models/movie.dart';
 import '../providers/search_provider.dart';
 import '../widgets/poster.dart';
+import '../providers/watchlist_provider.dart';
 import '../widgets/state_views.dart';
 import 'detail_screen.dart';
 
@@ -41,47 +42,58 @@ class _SearchScreenState extends State<SearchScreen> {
     final sp = context.watch<SearchProvider>();
     return Scaffold(
       appBar: AppBar(title: const Text('Search films')),
-      body: Column(children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: TextField(
-            controller: _controller,
-            onChanged: (v) {
-              sp.onQueryChanged(v);
-              setState(() {});
-            },
-            onSubmitted: sp.search,
-            textInputAction: TextInputAction.search,
-            decoration: InputDecoration(
-              hintText: 'Search by title…',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: _controller.text.isEmpty
-                  ? null
-                  : IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _controller.clear();
-                        sp.search('');
-                        setState(() {});
-                      },
-                    ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(28)),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: TextField(
+              controller: _controller,
+              onChanged: (v) {
+                sp.onQueryChanged(v);
+                setState(() {});
+              },
+              onSubmitted: sp.search,
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: 'Search by title…',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _controller.text.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _controller.clear();
+                          sp.search('');
+                          setState(() {});
+                        },
+                      ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Wrap(spacing: 8, children: [
-            for (final f in const [(null, 'All'), ('movie', 'Movies'), ('series', 'Series')])
-              ChoiceChip(
-                label: Text(f.$2),
-                selected: sp.typeFilter == f.$1,
-                onSelected: (_) => sp.setType(f.$1),
-              ),
-          ]),
-        ),
-        Expanded(child: _body(sp)),
-      ]),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Wrap(
+              spacing: 8,
+              children: [
+                for (final f in const [
+                  (null, 'All'),
+                  ('movie', 'Movies'),
+                  ('series', 'Series'),
+                ])
+                  ChoiceChip(
+                    label: Text(f.$2),
+                    selected: sp.typeFilter == f.$1,
+                    onSelected: (_) => sp.setType(f.$1),
+                  ),
+              ],
+            ),
+          ),
+          Expanded(child: _body(sp)),
+        ],
+      ),
     );
   }
 
@@ -89,14 +101,22 @@ class _SearchScreenState extends State<SearchScreen> {
     switch (sp.status) {
       case SearchStatus.idle:
         return const MessageView(
-            icon: Icons.local_movies_outlined, text: 'Type at least 3 letters to find a film.');
+          icon: Icons.local_movies_outlined,
+          text: 'Type at least 3 letters to find a film.',
+        );
       case SearchStatus.loading:
         return const Center(child: CircularProgressIndicator());
       case SearchStatus.empty:
-        return const MessageView(icon: Icons.search_off, text: 'No films matched your search.');
+        return const MessageView(
+          icon: Icons.search_off,
+          text: 'No films matched your search.',
+        );
       case SearchStatus.error:
         return MessageView(
-            icon: Icons.error_outline, text: sp.error ?? 'Something went wrong.', onRetry: sp.retry);
+          icon: Icons.error_outline,
+          text: sp.error ?? 'Something went wrong.',
+          onRetry: sp.retry,
+        );
       case SearchStatus.loaded:
         return ListView.builder(
           controller: _scroll,
@@ -104,7 +124,9 @@ class _SearchScreenState extends State<SearchScreen> {
           itemBuilder: (_, i) {
             if (i >= sp.results.length) {
               return const Padding(
-                  padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator()));
+                padding: EdgeInsets.all(16),
+                child: Center(child: CircularProgressIndicator()),
+              );
             }
             return _ResultTile(movie: sp.results[i]);
           },
@@ -119,13 +141,22 @@ class _ResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final saved = context.select<WatchlistProvider, bool>(
+      (w) => w.contains(movie.imdbId),
+    );
     return ListTile(
       leading: Poster(url: movie.poster),
       title: Text(movie.title, maxLines: 2, overflow: TextOverflow.ellipsis),
       subtitle: Text('${movie.year} · ${movie.type}'),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: IconButton(
+        tooltip: saved ? 'Remove from watchlist' : 'Add to watchlist',
+        icon: Icon(saved ? Icons.bookmark : Icons.bookmark_border),
+        onPressed: () => context.read<WatchlistProvider>().toggle(movie),
+      ),
       onTap: () => Navigator.push(
-          context, MaterialPageRoute(builder: (_) => DetailScreen(movie: movie))),
+        context,
+        MaterialPageRoute(builder: (_) => DetailScreen(movie: movie)),
+      ),
     );
   }
 }

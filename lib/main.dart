@@ -28,19 +28,21 @@ class MovieApp extends StatelessWidget {
       providers: [
         Provider<OmdbService>.value(value: service),
         ChangeNotifierProvider(create: (_) => SearchProvider(service)),
-        ChangeNotifierProvider(create: (_) => WatchlistProvider()..load())
+        ChangeNotifierProvider(create: (_) => WatchlistProvider()..load()),
       ],
       child: MaterialApp(
         title: 'Movie Search',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
         darkTheme: ThemeData(
-            colorSchemeSeed: Colors.indigo, brightness: Brightness.dark, useMaterial3: true),
+          colorSchemeSeed: Colors.indigo,
+          brightness: Brightness.dark,
+          useMaterial3: true,
+        ),
         home: const HomeShell(),
       ),
     );
   }
-  
 }
 
 class HomeShell extends StatefulWidget {
@@ -56,17 +58,24 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     final count = context.select<WatchlistProvider, int>((w) => w.items.length);
     return Scaffold(
-      body: IndexedStack(index: _index, children: const [SearchScreen(), WatchlistScreen()]),
+      body: IndexedStack(
+        index: _index,
+        children: const [SearchScreen(), WatchlistScreen()],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: [
-          const NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
+          const NavigationDestination(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
           NavigationDestination(
             icon: Badge(
-                isLabelVisible: count > 0,
-                label: Text('$count'),
-                child: const Icon(Icons.bookmark_border)),
+              isLabelVisible: count > 0,
+              label: Text('$count'),
+              child: const Icon(Icons.bookmark_border),
+            ),
             selectedIcon: const Icon(Icons.bookmark),
             label: 'Watchlist',
           ),

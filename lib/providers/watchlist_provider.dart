@@ -21,8 +21,11 @@ class WatchlistProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_storageKey);
       if (raw != null) {
-        _items.addAll((jsonDecode(raw) as List)
-            .map((e) => WatchlistItem.fromJson(e as Map<String, dynamic>)));
+        _items.addAll(
+          (jsonDecode(raw) as List).map(
+            (e) => WatchlistItem.fromJson(e as Map<String, dynamic>),
+          ),
+        );
       }
     } catch (_) {
       // Corrupt data: start fresh rather than crash.
@@ -33,7 +36,10 @@ class WatchlistProvider extends ChangeNotifier {
 
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_storageKey, jsonEncode(_items.map((i) => i.toJson()).toList()));
+    await prefs.setString(
+      _storageKey,
+      jsonEncode(_items.map((i) => i.toJson()).toList()),
+    );
   }
 
   void toggle(MovieSummary movie) {
