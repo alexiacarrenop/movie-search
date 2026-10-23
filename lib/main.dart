@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/search_provider.dart';
+import 'providers/watchlist_provider.dart';
 import 'screens/search_screen.dart';
 import 'services/omdb_service.dart';
 
@@ -26,6 +27,7 @@ class MovieApp extends StatelessWidget {
       providers: [
         Provider<OmdbService>.value(value: service),
         ChangeNotifierProvider(create: (_) => SearchProvider(service)),
+        ChangeNotifierProvider(create: (_) => WatchlistProvider()..load())
       ],
       child: MaterialApp(
         title: 'Movie Search',
