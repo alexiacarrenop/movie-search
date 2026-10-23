@@ -94,3 +94,17 @@ double? ratingFraction(String v) {
   }
   return null;
 }
+
+class WatchlistItem {
+  final MovieSummary movie;
+  final bool watched;
+  const WatchlistItem(this.movie, {this.watched = false});
+
+  WatchlistItem copyWith({bool? watched}) =>
+      WatchlistItem(movie, watched: watched ?? this.watched);
+
+  factory WatchlistItem.fromJson(Map<String, dynamic> j) =>
+      WatchlistItem(MovieSummary.fromJson(j['movie']), watched: j['watched'] ?? false);
+
+  Map<String, dynamic> toJson() => {'movie': movie.toJson(), 'watched': watched};
+}
