@@ -1,7 +1,33 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
-void main() {
+
+Future<void> main() async{
+  WidgetsFlutterBinding.ensureInitialized(); 
+  await dotenv.load(fileName: ".env"); // loads .env file to access API key
+  await _testOmdbApi(); 
+
   runApp(const MyApp());
+}
+
+Future<void> _testOmdbApi() async {
+  final apiKey = dotenv.env['OMDB_API_KEY'];
+  final url = Uri.parse('https://www.omdbapi.com/?apikey=$apiKey&s=Batman');
+
+  try {
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      print('OMDb API Test Success! First search result:');
+      print(data['Search'][0]);
+    } else {
+      print('OMDb API Error: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('OMDb API Exception: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -11,7 +37,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'OMDb Test',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -28,9 +54,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const Scaffold (
+        body: Center(child: Text('Check debug console for OMDb API test results.')),
+    ),
     );
   }
 }
