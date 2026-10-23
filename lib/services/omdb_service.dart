@@ -47,11 +47,14 @@ class OmdbService {
   }
 
   Future<SearchPage> search(String query, {int page = 1, String? type}) async {
-    final data = await _get({
+    final queryParams = <String, String>{
       's': query,
       'page': '$page',
-      if (type != null) 'type': type,
-    });
+    };
+    if (type != null) {
+      queryParams['type'] = type;
+    }
+    final data = await _get(queryParams);
     if (data['Response'] == 'False') {
       final err = data['Error']?.toString() ?? '';
       // "Movie not found!" / "Too many results." for empty states
