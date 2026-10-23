@@ -18,25 +18,34 @@ class MovieSummary {
   });
 
   factory MovieSummary.fromJson(Map<String, dynamic> j) => MovieSummary(
-        title: clean(j['Title']) ?? 'Untitled',
-        year: clean(j['Year']) ?? '',
-        imdbId: j['imdbID'] ?? '',
-        type: clean(j['Type']) ?? '',
-        poster: clean(j['Poster']),
-      );
+    title: clean(j['Title']) ?? 'Untitled',
+    year: clean(j['Year']) ?? '',
+    imdbId: j['imdbID'] ?? '',
+    type: clean(j['Type']) ?? '',
+    poster: clean(j['Poster']),
+  );
 
   Map<String, dynamic> toJson() => {
-        'Title': title,
-        'Year': year,
-        'imdbID': imdbId,
-        'Type': type,
-        'Poster': poster ?? 'N/A',
-      };
+    'Title': title,
+    'Year': year,
+    'imdbID': imdbId,
+    'Type': type,
+    'Poster': poster ?? 'N/A',
+  };
 }
 
 class MovieDetail {
   final String imdbId, title;
-  final String? year, rated, runtime, genre, director, actors, plot, poster, awards, type;
+  final String? year,
+      rated,
+      runtime,
+      genre,
+      director,
+      actors,
+      plot,
+      poster,
+      awards,
+      type;
   final Map<String, String> ratings; // source -> value
 
   const MovieDetail({
@@ -90,7 +99,9 @@ double? ratingFraction(String v) {
   final p = s.split('/');
   if (p.length == 2) {
     final a = double.tryParse(p[0]), b = double.tryParse(p[1]);
-    if (a != null && b != null && b > 0) return (a / b).clamp(0.0, 1.0).toDouble();
+        if (a != null && b != null && b > 0) {
+      return (a / b).clamp(0.0, 1.0).toDouble();
+    }
   }
   return null;
 }
@@ -103,8 +114,13 @@ class WatchlistItem {
   WatchlistItem copyWith({bool? watched}) =>
       WatchlistItem(movie, watched: watched ?? this.watched);
 
-  factory WatchlistItem.fromJson(Map<String, dynamic> j) =>
-      WatchlistItem(MovieSummary.fromJson(j['movie']), watched: j['watched'] ?? false);
+  factory WatchlistItem.fromJson(Map<String, dynamic> j) => WatchlistItem(
+    MovieSummary.fromJson(j['movie']),
+    watched: j['watched'] ?? false,
+  );
 
-  Map<String, dynamic> toJson() => {'movie': movie.toJson(), 'watched': watched};
+  Map<String, dynamic> toJson() => {
+    'movie': movie.toJson(),
+    'watched': watched,
+  };
 }

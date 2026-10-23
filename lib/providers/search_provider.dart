@@ -54,7 +54,9 @@ class SearchProvider extends ChangeNotifier {
     final requested = _query;
     try {
       final page = await _service.search(requested, type: typeFilter);
-      if (requested != _query) return; // stale response, a newer search is in flight
+      if (requested != _query) {
+        return; // stale response, a newer search is in flight 
+      }
       _page = 1;
       _total = page.total;
       results
@@ -62,7 +64,7 @@ class SearchProvider extends ChangeNotifier {
         ..addAll(page.movies);
       status = results.isEmpty ? SearchStatus.empty : SearchStatus.loaded;
     } catch (e) {
-      if (requested != _query) return;
+      if (requested != _query) { return; }
       error = e.toString();
       status = SearchStatus.error;
     }
@@ -76,7 +78,11 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
     final requested = _query;
     try {
-      final page = await _service.search(requested, page: _page + 1, type: typeFilter);
+      final page = await _service.search(
+        requested,
+        page: _page + 1,
+        type: typeFilter,
+      );
       if (requested == _query) {
         _page++;
         results.addAll(page.movies);
